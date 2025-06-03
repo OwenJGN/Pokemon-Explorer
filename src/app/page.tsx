@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 interface Pokemon {
   name: string
@@ -54,6 +55,11 @@ export default function HomePage() {
     }
   }
 
+  const extractPokemonId = (url : string) =>{
+    const parts = url.split('/')
+    return parts[parts.length - 2]
+  }
+
   if (loading) {
     return (
       <div className="container mx-auto p-4">
@@ -63,22 +69,28 @@ export default function HomePage() {
     )
   }
 
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Pokémon Explorer</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-        {pokemon.map((poke) => (
-          <Card key={poke.name} className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="capitalize">{poke.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">Click to view details</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+          {pokemon.map((poke) => {
+            const pokeId = extractPokemonId(poke.url);
+            return (
+            <Link key={poke.name} href = {`/pokemon/${pokeId}`}>
+              <Card key={poke.name} className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="capitalize">{poke.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">Click to view details</p>
+                </CardContent>
+              </Card>
+            </Link>
+          )
+          })}
+        </div>
 
       <div className="flex justify-between items-center">
         <Button 
