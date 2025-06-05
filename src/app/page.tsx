@@ -225,13 +225,18 @@ export default function HomePage() {
         <div className="flex items-center justify-center py-16">
           <div className="flex flex-col items-center gap-3">
               <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
-              <LoadingSpinner size="lg" />
           </div>
         </div>
 
         {/* Separator */}
         <div className="py-8">
           <div className="w-full h-px bg-gray-300"></div>
+        </div>
+
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-3">
+            <LoadingSpinner size="lg" />
+          </div>
         </div>
         
         {/* Body */}
@@ -315,7 +320,7 @@ export default function HomePage() {
           const pokeId = extractPokemonId(poke.url)
           return (
             <Link key={poke.name} href={`/pokemon/${pokeId}`}>
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow w-full h-full">
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow w-full h-full overflow-hidden p-0">
                 {poke.loading ? (
                   <>
                     <CardHeader>
@@ -326,30 +331,32 @@ export default function HomePage() {
                     </CardContent>
                   </>
                 ) : (
-                  <CardContent className="pt-4 px-3 pb-3 h-full flex flex-col">
+                  <CardContent className="p-0 h-full flex flex-col">
                     <div 
-                      className="flex justify-center mb-3 bg-zinc-100"
+                      className="flex justify-center mb-3 bg-zinc-100 rounded-t-lg"
                       style={{ minHeight: '200px' }}
                     >
                       {poke.sprite && (
                         <img src={poke.sprite} 
                         alt={poke.name} 
-                        className="object contain" 
-                        style={{ width: '18.47vw', height: '15.56vw' }}
+                        className="object-contain" 
+                        style={{ width: '266px', height: '224px' }}
                         />
                       )}
                     </div>
-                    <h3 className="text-lg font-bold capitalize mb-1">{poke.name}</h3>
-                    <p className="text-xs font-medium mb-2">ID: #{formatPokemonId(poke.id)}</p>
-                    <div className="flex gap-1 flex-wrap mt-auto">
-                      {poke.type.map((type, index) => (
-                        <span 
-                          key={index}
-                          className={`px-2 py-1 text-xs text-white rounded-full capitalize ${getTypeColor(type.type.name)}`}
-                        >
-                          {type.type.name}
-                        </span>
-                      ))}
+                    <div className="px-3 pb-3 flex flex-col flex-1">
+                      <h3 className="text-lg font-bold capitalize mb-1">{poke.name}</h3>
+                      <p className="text-sm text-gray-600 mb-3">#{formatPokemonId(poke.id)}</p>
+                      <div className="flex gap-1 flex-wrap mt-auto">
+                        {poke.type.map((type, index) => (
+                          <span 
+                            key={index}
+                            className="px-3 py-1 text-xs text-white rounded-full capitalize bg-[#18181B]"
+                          >
+                            {type.type.name}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                     
                   </CardContent>
