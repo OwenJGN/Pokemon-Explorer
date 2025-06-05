@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { Inter } from 'next/font/google';
 
@@ -221,26 +220,33 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col" style={{ minHeight: '149.10vw' }}>
-        {/* Header - 244px height */}
-        <div className="flex items-center justify-center" style={{ height: '16.94vw' }}>
+      <div className="min-h-screen flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-center py-16">
           <div className="flex flex-col items-center gap-3">
               <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
               <LoadingSpinner size="lg" />
           </div>
         </div>
 
-        {/* Separator - 194px */}
-        <div style={{ height: '13.47vw' }}></div>
+        {/* Separator */}
+        <div className="py-8">
+          <div className="w-full h-px bg-gray-300"></div>
+        </div>
         
-        {/* Body - 1465px */}
-        <div style={{ height: '101.74vw' }}></div>
+        {/* Body */}
+        <div className="flex-1 min-h-96"></div>
         
         {/* Separator - 194px */}
-        <div style={{ height: '13.47vw' }}></div>
+        <div className="py-8">
+          <div className="w-full h-px bg-gray-300"></div>
+        </div>
+        
         
         {/* Footer - 244px */}
-        <div style={{ height: '16.94vw' }}></div>
+        <div className="py-16 text-center">
+          <p>Thank you for using Pokémon Browser!</p>
+        </div>
       </div>
     )
   }
@@ -248,47 +254,30 @@ export default function HomePage() {
   const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon: pokemon
 
   return (
-      <div className={'${inter.className} min-h-screen flex flex-col mx-auto bg-white'}
-          /* Page Size - 1440px - 2147px */
-          style={{
-            minHeight: '149.10vw',
-            maxWidth: '100vw',
-            width: '100%'
-          }}
-      >
+      <div className={'${inter.className} min-h-screen flex flex-col mx-auto bg-white max-w-full'}>
       
-      {/* Header Section - 244px height */}
+      {/* Header Section*/}
       <div
-        className="flex flex-col items-center justify-center"
-        style={{ height: '16.94vw' }}
-      >
-        <h1 className="text-3xl font-bold mb-6 text-center pt-6">Pokémon Browser</h1>
-        <h2 className="text-l mb-6 text-center"> Search and find Pokémon</h2>
+        className="flex flex-col items-center justify-center py-16">
+        <h1 className="text-4xl md:text-6xl font-semibold text-center mb-4">
+          Pokémon Browser
+        </h1>
+        <h2 className="text-xl md:text-3xl font-semibold text-center text-zinc-500"> 
+          Search and find Pokémon
+        </h2>
       </div>
 
-      {/* First Separator - 194px */}
-      <div 
-        className="flex items-center justify-center"
-        style={{ height: '13.47vw' }}
-      >
+      {/* First Separator */}
+      <div className="py-8">
         <div className="w-full h-px bg-gray-300"></div>
       </div>
 
-      {/* Main Content Area - 1465px height */}
-      <div  
-        className="flex flex-col items-center"
-        style={{ height: '101.74vw' }}
-      >
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col items-center px-4 sm:px-6 lg:px-8">
 
-        {/* Search Section and Title - 1160px width, 86px from grid */}
-        <div
-        className="flex justify-between items-center w-full mb-4"
-        style={{ 
-          width: '80.56vw',
-          marginBottom: '2vw'
-        }}
-        >
-          <div>
+        {/* Search Section and Title */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full max-w-6xl mb-8 gap-4">
+          <div className="flex-1">
             {hasSearched && filteredPokemon.length > 0 ? (
               <h3 className="text-xl font-semibold">
                 Search Results for '{lastSearchTerm}'
@@ -303,7 +292,7 @@ export default function HomePage() {
             )}
           </div>
         
-        <div className="flex gap-2" style={{minWidth: '300px'}}>        
+        <div className="flex gap-2 w-full sm:w-auto min-w-0 sm:min-w-80">        
           <Input 
             placeholder="Find Pokémon" 
             value={searchTerm}
@@ -320,15 +309,8 @@ export default function HomePage() {
           </div>
         </div>
       
-      {/* Pokemon Grid - 1160x1293px with 32x60 gaps */}
-      <div 
-        className="grid grid-cols-4 mb-6"
-        style={{ 
-          width: '80.56vw',
-          height: '89.79vw',
-          gap: '4.17vw 2.22vw '
-        }}
-      >
+      {/* Pokemon Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl mb-8">
         {pokemonToDisplay.map((poke) => {
           const pokeId = extractPokemonId(poke.url)
           return (
@@ -346,8 +328,8 @@ export default function HomePage() {
                 ) : (
                   <CardContent className="pt-4 px-3 pb-3 h-full flex flex-col">
                     <div 
-                      className="flex justify-center mb-3 rounded-lg"
-                      style={{ backgroundColor: '#F4F4F5' }}
+                      className="flex justify-center mb-3 bg-zinc-100"
+                      style={{ minHeight: '200px' }}
                     >
                       {poke.sprite && (
                         <img src={poke.sprite} 
@@ -378,18 +360,13 @@ export default function HomePage() {
         })}
       </div>
 
-        {/* Navigation Buttons - 1160px width, 86px from grid */}
-        <div 
-          className="flex justify-center items-center gap-4"
-          style={{ 
-            width: '80.56vw',
-            marginTop: '2vw'
-          }}
-        >
+        {/* Navigation Buttons */}
+        <div className="flex justify-center items-center gap-4 mb-8">
           <Button 
             onClick={handlePrevious} 
             disabled={!prevUrl}
-            variant="outline"
+            variant="default"
+            className="bg-black text-white hover:bg-gray-800 disabled:bg-gray-400"
           >
             &#8592; Back
           </Button>
@@ -397,7 +374,8 @@ export default function HomePage() {
           <Button 
             onClick={handleNext} 
             disabled={!nextUrl}
-            variant="outline"
+            variant="default"
+            className="bg-black text-white hover:bg-gray-800 disabled:bg-gray-400"
           >
             Next &#8594;
           </Button>
@@ -405,19 +383,13 @@ export default function HomePage() {
       </div>
 
       {/* Second Separator - 194px */}
-      <div 
-        className="flex items-center justify-center"
-        style={{ height: '13.47vw' }}
-      >
+      <div className="py-8">
         <div className="w-full h-px bg-gray-300"></div>
       </div>
 
       {/* Footer Section - 244px height */}
-      <div 
-        className="flex items-center justify-center text-l text-center"
-        style={{ height: '16.94vw' }}
-      >
-        Thank you for using Pokémon Browser!
+      <div className="py-16 text-center">
+        <p className="text-lg">Thank you for using Pokémon Browser!</p>
       </div>
     </div>
   )
