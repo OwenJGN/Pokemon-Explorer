@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
+
 
 interface Pokemon {
   name: string
@@ -41,6 +43,18 @@ interface DetailedPokemonResponse {
   }
 }
 
+const LoadingSpinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-8 h-8',
+    lg: 'w-12 h-12'
+  }
+  
+  return (
+    <div className={`${sizeClasses[size]} animate-spin rounded-full border-1 border-gray-800 border-t-white`}></div>
+  )
+}
+
 export default function HomePage() {
   const [pokemon, setPokemon] = useState<Pokemon[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,6 +65,8 @@ export default function HomePage() {
   const [isSearching, setIsSearching] = useState(false)
   const [filteredPokemon, setFilteredPokemon] = useState<Pokemon[]>([])
   const [allPokemonNames, setAllPokemonNames] = useState<SimplePokemon[]>([])
+  const [hasSearched, setHasSearched] = useState(false)
+  const [lastSearchTerm, setLastSearchTerm] = useState('')
 
   const extractPokemonId = (url: string) => {
     const parts = url.split('/')
@@ -153,9 +169,14 @@ export default function HomePage() {
 
   const searchForPokemon = async () => {
 
+    setLastSearchTerm(searchTerm.trim())
+    setHasSearched(true)
+
     if (!searchTerm.trim()) {
       setFilteredPokemon([])
       setIsSearching(false)
+      setHasSearched(false)
+      setLastSearchTerm('')
       return
     }
 
@@ -185,7 +206,6 @@ export default function HomePage() {
       console.error('Error searching for Pokémon:', error)
       setFilteredPokemon([])
     }
-    
     setIsSearching(false)
   }
 
@@ -217,7 +237,11 @@ export default function HomePage() {
     return (
       <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
-        <div className="text-l mb-6 text-center">Loading Pokémon...</div>
+        <div className="flex justify-center items-center py-12">
+          <div className="flex flex-col items-center gap-3">
+            <LoadingSpinner size="lg" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -226,6 +250,10 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto p-4">
+      
+      <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
+      <h2 className="text-l mb-6 text-center"> Search and find Pokémon</h2>
+
       <div className="mb-6 max-w-md mx-auto">
       <Input 
         placeholder="Find Pokémon" 
@@ -242,9 +270,21 @@ export default function HomePage() {
       </Button>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
-      <h2 className="text-l mb-6 text-center"> Search and find Pokémon</h2>
-      
+      <div className="mb-4">
+        {hasSearched && filteredPokemon.length > 0 ? (
+          <h3 className="text-xl font-semibold">
+            Search Results for '{lastSearchTerm}'
+            {filteredPokemon.length === 20 && " (showing first 20 results)"}
+          </h3>
+        ) : hasSearched && filteredPokemon.length === 0 && !isSearching ? (
+          <h3 className="text-xl font-semibold">
+            No Pokémon found for "{lastSearchTerm}"
+          </h3>
+        ) : (
+          <h3 className="text-xl font-semibold">Explore Pokémon</h3>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
         {pokemonToDisplay.map((poke) => {
           const pokeId = extractPokemonId(poke.url)
@@ -285,24 +325,9 @@ export default function HomePage() {
             </Link>
           )
         })}
-
-        {filteredPokemon.length === 0 && searchTerm && !isSearching && (
-          <div className="text-center mb-4">
-            <div className="text-sm text-gray-500">No Pokémon found for "{searchTerm}"</div>
-          </div>
-        )}
-
-        {filteredPokemon.length > 0 && (
-          <div className="text-center mb-4">
-            <div className="text-sm text-gray-500">
-              Search Results for "{searchTerm}"
-              {filteredPokemon.length === 20 && " (showing first 20 results)"}
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className="flex justify-between items-center">
+      <div className="flex justify-center items-center gap-4 mt-8">
         <Button 
           onClick={handlePrevious} 
           disabled={!prevUrl}
@@ -318,6 +343,10 @@ export default function HomePage() {
         >
           Next
         </Button>
+      </div>
+
+      <div className="text-l mb-6 text-center py-25">
+        Thank you for using Pokémon Browser!
       </div>
     </div>
   )

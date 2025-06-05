@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, use } from 'react'
-
+import { Skeleton } from '@/components/ui/skeleton'
 interface PageProps {
   params: Promise<{
     id: string
@@ -41,6 +41,18 @@ interface PokemonDetail {
   base_experience: number
 }
 
+const LoadingSpinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-8 h-8',
+    lg: 'w-12 h-12'
+  }
+  
+  return (
+    <div className={`${sizeClasses[size]} animate-spin rounded-full border-1 border-gray-800 border-t-white`}></div>
+  )
+}
+
 export default function DisplayDetails({params}: PageProps){
     const [pokemon, setPokemon] = useState<PokemonDetail | null>(null)
     const [loading, setLoading] = useState(true)
@@ -72,7 +84,21 @@ export default function DisplayDetails({params}: PageProps){
     }, [pokeId])
 
     if (loading) {
-        return <div>Loading Pokemon details...</div>
+        return (
+            <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+                <h1>Pokemon Details</h1>
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    padding: '60px 0',
+                    flexDirection: 'column',
+                    gap: '12px'
+                }}>
+                    <LoadingSpinner size="lg" />
+                </div>
+            </div>
+        )
     }
 
     if (error) {
@@ -89,7 +115,7 @@ export default function DisplayDetails({params}: PageProps){
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1>Pokemon Details</h1>
+            <h1>Pokemon Browser</h1>
             
             <div style={{ marginBottom: '30px', border: '1px solid #ccc', padding: '15px' }}>
                 <h2>Basic Information</h2>
@@ -170,6 +196,10 @@ export default function DisplayDetails({params}: PageProps){
                 ) : (
                     <p>No stats found</p>
                 )}
+            </div>
+
+            <div className="text-l mb-6 text-center py-25">
+                Thank you for using Pokémon Browser!
             </div>
         </div>
     )
