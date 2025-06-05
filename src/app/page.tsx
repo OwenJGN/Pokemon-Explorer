@@ -10,7 +10,6 @@ import { Inter } from 'next/font/google';
 const inter = Inter({
   subsets: ['latin'],
   weight: ['600'], 
-  variable: '--font-inter',
 });
 
 interface Pokemon {
@@ -215,45 +214,7 @@ export default function HomePage() {
   }
 
   const getTypeColor = (typeName: string) => {
-    return 'bg-gray-400'
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-center py-16">
-          <div className="flex flex-col items-center gap-3">
-              <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
-          </div>
-        </div>
-
-        {/* Separator */}
-        <div className="py-8">
-          <div className="w-full h-px bg-gray-300"></div>
-        </div>
-
-        <div className="flex items-center justify-center py-16">
-          <div className="flex flex-col items-center gap-3">
-            <LoadingSpinner size="lg" />
-          </div>
-        </div>
-        
-        {/* Body */}
-        <div className="flex-1 min-h-96"></div>
-        
-        {/* Separator - 194px */}
-        <div className="py-8">
-          <div className="w-full h-px bg-gray-300"></div>
-        </div>
-        
-        
-        {/* Footer - 244px */}
-        <div className="py-16 text-center">
-          <p>Thank you for using Pokémon Browser!</p>
-        </div>
-      </div>
-    )
+    return typeName === 'poison' || typeName === 'grass' ? '#18181BCC' : '#181A1B'
   }
 
   const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon: pokemon
@@ -267,7 +228,7 @@ export default function HomePage() {
         <h1 className="text-4xl md:text-6xl font-semibold text-center mb-4">
           Pokémon Browser
         </h1>
-        <h2 className="text-xl md:text-3xl font-semibold text-center text-zinc-500"> 
+          <h2 className="text-xl md:text-3xl font-semibold text-center text-[#71717A]"> 
           Search and find Pokémon
         </h2>
       </div>
@@ -284,7 +245,7 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full max-w-6xl mb-8 gap-4">
           <div className="flex-1">
             {hasSearched && filteredPokemon.length > 0 ? (
-              <h3 className="text-xl font-semibold">
+              <h3 className="text-2xl font-semibold">
                 Search Results for '{lastSearchTerm}'
                 {filteredPokemon.length === 12 && " (showing first 12 results)"}
               </h3>
@@ -293,7 +254,7 @@ export default function HomePage() {
                 No Pokémon found for "{lastSearchTerm}"
               </h3>
             ) : (
-              <h3 className="text-xl font-semibold">Explore Pokémon</h3>
+              <h3 className="text-2xl font-semibold">Explore Pokémon</h3>
             )}
           </div>
         
@@ -315,6 +276,13 @@ export default function HomePage() {
         </div>
       
       {/* Pokemon Grid */}
+      { loading ? (
+        <div className="flex items-center justify-center w-full max-w-6xl mb-8" style={{ minHeight: '400px' }}>
+          <div className="flex flex-col items-center gap-3">
+            <LoadingSpinner size="lg" />
+          </div>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl mb-8">
         {pokemonToDisplay.map((poke) => {
           const pokeId = extractPokemonId(poke.url)
@@ -339,19 +307,20 @@ export default function HomePage() {
                       {poke.sprite && (
                         <img src={poke.sprite} 
                         alt={poke.name} 
-                        className="object-contain" 
+                        className="object-contain"  
                         style={{ width: '266px', height: '224px' }}
                         />
                       )}
                     </div>
                     <div className="px-3 pb-3 flex flex-col flex-1">
-                      <h3 className="text-lg font-bold capitalize mb-1">{poke.name}</h3>
-                      <p className="text-sm text-gray-600 mb-3">#{formatPokemonId(poke.id)}</p>
-                      <div className="flex gap-1 flex-wrap mt-auto">
+                      <h3 className="text-2xl font-semibold capitalize mb-1 px-2">{poke.name}</h3>
+                      <p className="text-md text-zinc-500 font-semibold mb-10 px-2">#{formatPokemonId(poke.id)}</p>
+                      <div className="px-2 flex gap-3 flex-wrap mt-auto mb-4">
                         {poke.type.map((type, index) => (
                           <span 
                             key={index}
-                            className="px-3 py-1 text-xs text-white rounded-full capitalize bg-[#18181B]"
+                            className="px-2.5 py-0.5 font-semibold text-white text-xs rounded-sm capitalize flex items-center justify-center"
+                            style={{backgroundColor: getTypeColor(type.type.name)}}
                           >
                             {type.type.name}
                           </span>
@@ -366,14 +335,15 @@ export default function HomePage() {
           )
         })}
       </div>
-
+      )}
+      
         {/* Navigation Buttons */}
         <div className="flex justify-center items-center gap-4 mb-8">
           <Button 
             onClick={handlePrevious} 
             disabled={!prevUrl}
             variant="default"
-            className="bg-black text-white hover:bg-gray-800 disabled:bg-gray-400"
+            className="bg-black text-white hover:bg-[#181A1B] disabled:bg-[#8C8D8D]"
           >
             &#8592; Back
           </Button>
@@ -382,21 +352,21 @@ export default function HomePage() {
             onClick={handleNext} 
             disabled={!nextUrl}
             variant="default"
-            className="bg-black text-white hover:bg-gray-800 disabled:bg-gray-400"
+            className="bg-black text-white hover:bg-[#181A1B] disabled:bg-[#8C8D8D]"
           >
             Next &#8594;
           </Button>
         </div>
       </div>
 
-      {/* Second Separator - 194px */}
+      {/* Second Separator*/}
       <div className="py-8">
         <div className="w-full h-px bg-gray-300"></div>
       </div>
 
-      {/* Footer Section - 244px height */}
-      <div className="py-16 text-center">
-        <p className="text-lg">Thank you for using Pokémon Browser!</p>
+      {/* Footer Section*/}
+      <div className="py-16 text-center text-lg text-semibold">
+          Thank you for using Pokémon Browser!
       </div>
     </div>
   )
