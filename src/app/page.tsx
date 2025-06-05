@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
+import { Inter } from 'next/font/google';
 
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['600'], 
+  variable: '--font-inter',
+});
 
 interface Pokemon {
   name: string
@@ -58,7 +64,7 @@ const LoadingSpinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
 export default function HomePage() {
   const [pokemon, setPokemon] = useState<Pokemon[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentUrl, setCurrentUrl] = useState('https://pokeapi.co/api/v2/pokemon?limit=20')
+  const [currentUrl, setCurrentUrl] = useState('https://pokeapi.co/api/v2/pokemon?limit=12')
   const [nextUrl, setNextUrl] = useState<string | null>(null)
   const [prevUrl, setPrevUrl] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -187,7 +193,7 @@ export default function HomePage() {
         pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
 
-      const limitedMatches = matchingNames.slice(0, 20)
+      const limitedMatches = matchingNames.slice(0, 12)
 
       if (limitedMatches.length === 0) {
         setFilteredPokemon([])
@@ -210,38 +216,31 @@ export default function HomePage() {
   }
 
   const getTypeColor = (typeName: string) => {
-    const colors: { [key: string]: string } = {
-      fire: 'bg-red-500',
-      water: 'bg-blue-500',
-      grass: 'bg-green-500',
-      electric: 'bg-yellow-500',
-      psychic: 'bg-pink-500',
-      ice: 'bg-cyan-500',
-      dragon: 'bg-purple-500',
-      dark: 'bg-gray-800',
-      fairy: 'bg-pink-300',
-      fighting: 'bg-red-700',
-      poison: 'bg-purple-600',
-      ground: 'bg-yellow-600',
-      flying: 'bg-indigo-400',
-      bug: 'bg-green-400',
-      rock: 'bg-yellow-800',
-      ghost: 'bg-purple-700',
-      steel: 'bg-gray-500',
-      normal: 'bg-gray-400'
-    }
-    return colors[typeName] || 'bg-gray-400'
+    return 'bg-gray-400'
   }
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
-        <div className="flex justify-center items-center py-12">
+      <div className="min-h-screen flex flex-col" style={{ minHeight: '149.10vw' }}>
+        {/* Header - 244px height */}
+        <div className="flex items-center justify-center" style={{ height: '16.94vw' }}>
           <div className="flex flex-col items-center gap-3">
-            <LoadingSpinner size="lg" />
+              <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
+              <LoadingSpinner size="lg" />
           </div>
         </div>
+
+        {/* Separator - 194px */}
+        <div style={{ height: '13.47vw' }}></div>
+        
+        {/* Body - 1465px */}
+        <div style={{ height: '101.74vw' }}></div>
+        
+        {/* Separator - 194px */}
+        <div style={{ height: '13.47vw' }}></div>
+        
+        {/* Footer - 244px */}
+        <div style={{ height: '16.94vw' }}></div>
       </div>
     )
   }
@@ -249,67 +248,118 @@ export default function HomePage() {
   const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon: pokemon
 
   return (
-    <div className="container mx-auto p-4">
-      
-      <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
-      <h2 className="text-l mb-6 text-center"> Search and find Pokémon</h2>
-
-      <div className="mb-6 max-w-md mx-auto">
-      <Input 
-        placeholder="Find Pokémon" 
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full"
-      />
-      <Button
-        onClick={searchForPokemon}
-        disabled={isSearching}
-        variant='default'
+      <div className={'${inter.className} min-h-screen flex flex-col mx-auto bg-white'}
+          /* Page Size - 1440px - 2147px */
+          style={{
+            minHeight: '149.10vw',
+            maxWidth: '100vw',
+            width: '100%'
+          }}
       >
-         {isSearching ? "Searching..." : "Search"}
-      </Button>
+      
+      {/* Header Section - 244px height */}
+      <div
+        className="flex flex-col items-center justify-center"
+        style={{ height: '16.94vw' }}
+      >
+        <h1 className="text-3xl font-bold mb-6 text-center pt-6">Pokémon Browser</h1>
+        <h2 className="text-l mb-6 text-center"> Search and find Pokémon</h2>
       </div>
 
-      <div className="mb-4">
-        {hasSearched && filteredPokemon.length > 0 ? (
-          <h3 className="text-xl font-semibold">
-            Search Results for '{lastSearchTerm}'
-            {filteredPokemon.length === 20 && " (showing first 20 results)"}
-          </h3>
-        ) : hasSearched && filteredPokemon.length === 0 && !isSearching ? (
-          <h3 className="text-xl font-semibold">
-            No Pokémon found for "{lastSearchTerm}"
-          </h3>
-        ) : (
-          <h3 className="text-xl font-semibold">Explore Pokémon</h3>
-        )}
+      {/* First Separator - 194px */}
+      <div 
+        className="flex items-center justify-center"
+        style={{ height: '13.47vw' }}
+      >
+        <div className="w-full h-px bg-gray-300"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+      {/* Main Content Area - 1465px height */}
+      <div  
+        className="flex flex-col items-center"
+        style={{ height: '101.74vw' }}
+      >
+
+        {/* Search Section and Title - 1160px width, 86px from grid */}
+        <div
+        className="flex justify-between items-center w-full mb-4"
+        style={{ 
+          width: '80.56vw',
+          marginBottom: '2vw'
+        }}
+        >
+          <div>
+            {hasSearched && filteredPokemon.length > 0 ? (
+              <h3 className="text-xl font-semibold">
+                Search Results for '{lastSearchTerm}'
+                {filteredPokemon.length === 12 && " (showing first 12 results)"}
+              </h3>
+            ) : hasSearched && filteredPokemon.length === 0 && !isSearching ? (
+              <h3 className="text-xl font-semibold">
+                No Pokémon found for "{lastSearchTerm}"
+              </h3>
+            ) : (
+              <h3 className="text-xl font-semibold">Explore Pokémon</h3>
+            )}
+          </div>
+        
+        <div className="flex gap-2" style={{minWidth: '300px'}}>        
+          <Input 
+            placeholder="Find Pokémon" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1"
+          />
+          <Button
+            onClick={searchForPokemon}
+            disabled={isSearching}
+            variant='default'
+          >
+            {isSearching ? "Searching..." : "Search"}
+          </Button>
+          </div>
+        </div>
+      
+      {/* Pokemon Grid - 1160x1293px with 32x60 gaps */}
+      <div 
+        className="grid grid-cols-4 mb-6"
+        style={{ 
+          width: '80.56vw',
+          height: '89.79vw',
+          gap: '4.17vw 2.22vw '
+        }}
+      >
         {pokemonToDisplay.map((poke) => {
           const pokeId = extractPokemonId(poke.url)
           return (
             <Link key={poke.name} href={`/pokemon/${pokeId}`}>
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow w-full h-full">
                 {poke.loading ? (
                   <>
                     <CardHeader>
-                      <CardTitle className="capitalize">{poke.name}</CardTitle>
+                      <CardTitle className="capitalize text-sm">{poke.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-sm text-gray-500">Opening Pokéball...</div>
+                      <div className="text-xs text-gray-500">Opening Pokéball...</div>
                     </CardContent>
                   </>
                 ) : (
-                  <CardContent className="pt-6">
-                    <div className="flex justify-center mb-3">
+                  <CardContent className="pt-4 px-3 pb-3 h-full flex flex-col">
+                    <div 
+                      className="flex justify-center mb-3 rounded-lg"
+                      style={{ backgroundColor: '#F4F4F5' }}
+                    >
                       {poke.sprite && (
-                        <img src={poke.sprite} alt={poke.name} className="w-20 h-20" />
+                        <img src={poke.sprite} 
+                        alt={poke.name} 
+                        className="object contain" 
+                        style={{ width: '18.47vw', height: '15.56vw' }}
+                        />
                       )}
                     </div>
-                    <h3 className="text-lg font-bold capitalize mb-2">{poke.name}</h3>
-                    <p className="text-sm font-medium ">ID: #{formatPokemonId(poke.id)}</p>
-                    <div className="flex gap-1 mt-2 flex-wrap ">
+                    <h3 className="text-lg font-bold capitalize mb-1">{poke.name}</h3>
+                    <p className="text-xs font-medium mb-2">ID: #{formatPokemonId(poke.id)}</p>
+                    <div className="flex gap-1 flex-wrap mt-auto">
                       {poke.type.map((type, index) => (
                         <span 
                           key={index}
@@ -319,6 +369,7 @@ export default function HomePage() {
                         </span>
                       ))}
                     </div>
+                    
                   </CardContent>
                 )}
               </Card>
@@ -327,25 +378,45 @@ export default function HomePage() {
         })}
       </div>
 
-      <div className="flex justify-center items-center gap-4 mt-8">
-        <Button 
-          onClick={handlePrevious} 
-          disabled={!prevUrl}
-          variant="outline"
+        {/* Navigation Buttons - 1160px width, 86px from grid */}
+        <div 
+          className="flex justify-center items-center gap-4"
+          style={{ 
+            width: '80.56vw',
+            marginTop: '2vw'
+          }}
         >
-          Previous
-        </Button>
-        
-        <Button 
-          onClick={handleNext} 
-          disabled={!nextUrl}
-          variant="outline"
-        >
-          Next
-        </Button>
+          <Button 
+            onClick={handlePrevious} 
+            disabled={!prevUrl}
+            variant="outline"
+          >
+            &#8592; Back
+          </Button>
+          
+          <Button 
+            onClick={handleNext} 
+            disabled={!nextUrl}
+            variant="outline"
+          >
+            Next &#8594;
+          </Button>
+        </div>
       </div>
 
-      <div className="text-l mb-6 text-center py-25">
+      {/* Second Separator - 194px */}
+      <div 
+        className="flex items-center justify-center"
+        style={{ height: '13.47vw' }}
+      >
+        <div className="w-full h-px bg-gray-300"></div>
+      </div>
+
+      {/* Footer Section - 244px height */}
+      <div 
+        className="flex items-center justify-center text-l text-center"
+        style={{ height: '16.94vw' }}
+      >
         Thank you for using Pokémon Browser!
       </div>
     </div>
