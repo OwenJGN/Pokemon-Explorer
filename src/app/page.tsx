@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 
 interface Pokemon {
@@ -46,6 +47,10 @@ export default function HomePage() {
   const [currentUrl, setCurrentUrl] = useState('https://pokeapi.co/api/v2/pokemon?limit=20')
   const [nextUrl, setNextUrl] = useState<string | null>(null)
   const [prevUrl, setPrevUrl] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [filteredPokemon, setFilteredPokemon] = useState<Pokemon[]>([])
+  const [allPokemonNames, setAllPokemonNames] = useState<SimplePokemon[]>([])
 
   const extractPokemonId = (url: string) => {
     const parts = url.split('/')
@@ -117,6 +122,19 @@ export default function HomePage() {
     fetchPokemon(currentUrl)
   }, [currentUrl])
 
+  useEffect(() => {
+      const fetchAllPokemonNames = async () => {
+      try {
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=2000')
+        const data: PokemonResponse = await response.json()
+        setAllPokemonNames(data.results)
+      } catch (error) {
+        console.error('Error fetching all Pokémon names:', error)
+      }
+    }
+
+    fetchAllPokemonNames()
+  }, [])
   const handleNext = () => {
     if (nextUrl) {
       setCurrentUrl(nextUrl)
@@ -132,6 +150,45 @@ export default function HomePage() {
   const formatPokemonId = (id: number) => {
     return id.toString().padStart(4, '0')
   }
+
+  const searchForPokemon = async () => {
+
+    if (!searchTerm.trim()) {
+      setFilteredPokemon([])
+      setIsSearching(false)
+      return
+    }
+
+    setIsSearching(true)
+    
+    try {
+      const matchingNames = allPokemonNames.filter(pokemon => 
+        pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+
+      const limitedMatches = matchingNames.slice(0, 20)
+
+      if (limitedMatches.length === 0) {
+        setFilteredPokemon([])
+        setIsSearching(false)
+        return
+      }
+
+      const pokemonDetailsPromises = limitedMatches.map(pokemon => 
+        fetchPokemonDetails(pokemon.url)
+      )
+      
+      const detailedPokemon = await Promise.all(pokemonDetailsPromises)
+      setFilteredPokemon(detailedPokemon)
+      
+    } catch (error) {
+      console.error('Error searching for Pokémon:', error)
+      setFilteredPokemon([])
+    }
+    
+    setIsSearching(false)
+  }
+
   const getTypeColor = (typeName: string) => {
     const colors: { [key: string]: string } = {
       fire: 'bg-red-500',
@@ -165,13 +222,31 @@ export default function HomePage() {
     )
   }
 
+  const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon: pokemon
+
   return (
     <div className="container mx-auto p-4">
+      <div className="mb-6 max-w-md mx-auto">
+      <Input 
+        placeholder="Find Pokémon" 
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full"
+      />
+      <Button
+        onClick={searchForPokemon}
+        disabled={isSearching}
+        variant='default'
+      >
+         {isSearching ? "Searching..." : "Search"}
+      </Button>
+      </div>
+
       <h1 className="text-3xl font-bold mb-6 text-center">Pokémon Browser</h1>
       <h2 className="text-l mb-6 text-center"> Search and find Pokémon</h2>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-        {pokemon.map((poke) => {
+        {pokemonToDisplay.map((poke) => {
           const pokeId = extractPokemonId(poke.url)
           return (
             <Link key={poke.name} href={`/pokemon/${pokeId}`}>
@@ -210,6 +285,21 @@ export default function HomePage() {
             </Link>
           )
         })}
+
+        {filteredPokemon.length === 0 && searchTerm && !isSearching && (
+          <div className="text-center mb-4">
+            <div className="text-sm text-gray-500">No Pokémon found for "{searchTerm}"</div>
+          </div>
+        )}
+
+        {filteredPokemon.length > 0 && (
+          <div className="text-center mb-4">
+            <div className="text-sm text-gray-500">
+              Search Results for "{searchTerm}"
+              {filteredPokemon.length === 20 && " (showing first 20 results)"}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between items-center">
