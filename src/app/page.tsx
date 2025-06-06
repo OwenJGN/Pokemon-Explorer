@@ -20,6 +20,7 @@ const inter = Inter({
 })
 
 export default function HomePage() {
+
   // Main hook for fetching and paginating through Pokémon lists from API
   const {
     pokemon,
@@ -48,6 +49,7 @@ export default function HomePage() {
 
   return (
     <div className={`${inter.className} min-h-screen flex flex-col bg-white`}>
+      
       {/* Page header with title and subtitle */}
       <Header 
         title="Pokémon Browser" 

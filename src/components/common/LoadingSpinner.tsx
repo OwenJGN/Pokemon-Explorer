@@ -10,6 +10,7 @@ interface LoadingSpinnerProps {
  * Provides visual feedback during API calls and data fetching 
  */
 const LoadingSpinner = ({ size = 'md', className }: LoadingSpinnerProps) => {
+  
   // Size mappings for different use cases (cards, full page loading)
   const sizeClasses = {
     sm: 'w-4 h-4',     // NOT IN USE

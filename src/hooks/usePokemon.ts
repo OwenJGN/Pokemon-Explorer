@@ -34,6 +34,7 @@ export const usePokemon = () => {
   const fetchPokemon = async (url: string) => {
     setLoading(true)
     try {
+      
       // First, get the basic Pokemon list from API
       const data = await fetchPokemonList(url)
       

@@ -22,6 +22,7 @@ export const usePokemonSearch = (allPokemonNames: SimplePokemon[]) => {
    * Handles empty searches, result limiting, and loading states
    */
   const searchForPokemon = async () => {
+
     // Store search term for result display context
     setLastSearchTerm(searchTerm.trim())
     setHasSearched(true)

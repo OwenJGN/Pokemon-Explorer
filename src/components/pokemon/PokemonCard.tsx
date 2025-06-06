@@ -22,6 +22,7 @@ const getTypeColor = (typeName: string) => {
  * Features Pokemon image, name, ID, and type badges
  */
 const PokemonCard = ({ pokemon }: PokemonCardProps) => {
+
   // Extract Pokemon ID from API URL for navigation routing
   const pokeId = extractPokemonId(pokemon.url)
 
@@ -37,6 +38,7 @@ const PokemonCard = ({ pokemon }: PokemonCardProps) => {
   }
 
   return (
+    
     // Entire card is wrapped in Link for navigation to detail page
     <Link href={`/pokemon/${pokeId}`}>
       <Card className="cursor-pointer hover:shadow-lg transition-shadow w-full h-full overflow-hidden p-0">

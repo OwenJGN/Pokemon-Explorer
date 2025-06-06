@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { PokemonDetail } from '@/lib/types/pokemon'
 import { 
-  fetchPokemonDetails, 
+  fetchPokemonDetail, 
   fetchPokemonSpecies,
   getWeaknessTypes,
   getGenderDisplay 
@@ -41,6 +41,7 @@ export const usePokemonDetail = (pokemonId: string): UsePokemonDetailReturn => {
    * Process Pokemon species data to extract human readable information
    */
   const processSpeciesData = (speciesData: any) => {
+
     // Find English description from available flavor text entries
     const englishEntry = speciesData.flavor_text_entries.find(
       (entry: any) => entry.language.name === 'en'
@@ -75,8 +76,9 @@ export const usePokemonDetail = (pokemonId: string): UsePokemonDetailReturn => {
     setError(null)
     
     try {
+        
       // Fetch primary Pokemon data (stats, types, abilities, etc.)
-      const pokemonData = await fetchPokemonDetails(pokemonId)
+      const pokemonData = await fetchPokemonDetail(pokemonId)
       setPokemon(pokemonData)
 
       // Fetch species-specific data (description, category, gender info)

@@ -1,6 +1,6 @@
 /**
  * Pokemon API configuration constants
- */
+*/
 
 /** Base URL for all Pokemon API requests */
 export const POKEMON_API_BASE_URL = 'https://pokeapi.co/api/v2'

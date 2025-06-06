@@ -8,6 +8,7 @@ interface PokemonDetailDescriptionProps {
  * Pokemon description display component for detail pages
  */
 const PokemonDetailDescription = ({ description }: PokemonDetailDescriptionProps) => {
+    
   // Don't render anything if no description is available
   if (!description) return null
 
@@ -19,7 +20,7 @@ const PokemonDetailDescription = ({ description }: PokemonDetailDescriptionProps
           <CardContent className="p-6 h-full">
             <div className="flex items-center gap-4 h-full">
 
-              {/* Decorative Pokeball icon */}
+              {/* Decorative Pokeball icon compliant with the Figma Design*/}
               <div className="ml-6 w-23 h-23 bg-white rounded-full flex items-center justify-center flex-shrink-0">
                 <img 
                   src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/cherish-ball.png"
@@ -27,7 +28,7 @@ const PokemonDetailDescription = ({ description }: PokemonDetailDescriptionProps
                   className="w-30 h-30 object-contain"
                 />
               </div>
-              
+
               {/* Pokemon description text */}
               <p className="leading-relaxed flex-1 p-6">{description}</p>
             </div>

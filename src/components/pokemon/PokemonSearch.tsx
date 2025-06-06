@@ -32,6 +32,7 @@ const PokemonSearch = ({
    * Provides feedback about search results or current browse mode
    */
   const getTitle = () => {
+    
     // Show search results with count and pagination info
     if (hasSearched && resultCount > 0) {
       return `Search Results for '${lastSearchTerm}'${resultCount === maxResults ? ` (showing first ${maxResults} results)` : ''}`
@@ -59,7 +60,7 @@ const PokemonSearch = ({
             onChange={(e) => onSearchTermChange(e.target.value)}
             className="flex-1"
           />
-          
+
           {/* Search button with loading state feedback */}
           <Button
             onClick={onSearch}
