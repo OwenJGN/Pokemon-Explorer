@@ -1,373 +1,99 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import Link from 'next/link'
-import { Inter } from 'next/font/google';
+import { Inter } from 'next/font/google'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import Separator from '@/components/layout/Separator'
+import PokemonSearch from '@/components/pokemon/PokemonSearch'
+import PokemonGrid from '@/components/pokemon/PokemonGrid'
+import NavigationButtons from '@/components/common/NavigationButtons'
+import LoadingSpinner from '@/components/common/LoadingSpinner'
+import { usePokemon } from '@/hooks/usePokemon'
+import { usePokemonSearch } from '@/hooks/usePokemonSearch'
+import { MAX_SEARCH_RESULTS } from '@/lib/constants/pokemon'
 
 const inter = Inter({
   subsets: ['latin'],
   weight: ['600'], 
-});
-
-interface Pokemon {
-  name: string
-  id: number
-  type: PokemonType[]
-  sprite: string
-  loading: boolean
-  url: string
-}
-
-interface PokemonType {
-  type: {
-    name: string
-  }
-}
-
-interface SimplePokemon {
-  name: string
-  url: string
-}
-
-interface PokemonResponse {
-  results: SimplePokemon[]
-  next: string | null
-  previous: string | null
-}
-
-interface DetailedPokemonResponse {
-  id: number
-  name: string
-  types: PokemonType[]
-  sprites: {
-    front_default: string | null
-  }
-}
-
-const LoadingSpinner = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
-  }
-  
-  return (
-    <div className={`${sizeClasses[size]} animate-spin rounded-full border-1 border-gray-800 border-t-white`}></div>
-  )
-}
+  variable: '--font-inter',
+})
 
 export default function HomePage() {
-  const [pokemon, setPokemon] = useState<Pokemon[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentUrl, setCurrentUrl] = useState('https://pokeapi.co/api/v2/pokemon?limit=12')
-  const [nextUrl, setNextUrl] = useState<string | null>(null)
-  const [prevUrl, setPrevUrl] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [isSearching, setIsSearching] = useState(false)
-  const [filteredPokemon, setFilteredPokemon] = useState<Pokemon[]>([])
-  const [allPokemonNames, setAllPokemonNames] = useState<SimplePokemon[]>([])
-  const [hasSearched, setHasSearched] = useState(false)
-  const [lastSearchTerm, setLastSearchTerm] = useState('')
+  const {
+    pokemon,
+    loading,
+    nextUrl,
+    prevUrl,
+    allPokemonNames,
+    handleNext,
+    handlePrevious
+  } = usePokemon()
 
-  const extractPokemonId = (url: string) => {
-    const parts = url.split('/')
-    return parts[parts.length - 2]
-  }
+  const {
+    searchTerm,
+    setSearchTerm,
+    isSearching,
+    filteredPokemon,
+    hasSearched,
+    lastSearchTerm,
+    returnsResults,
+    searchForPokemon
+  } = usePokemonSearch(allPokemonNames)
 
-  const fetchPokemonDetails = async (url: string): Promise<Pokemon> => {
-    const id = extractPokemonId(url)
-    
-    try {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-      const data: DetailedPokemonResponse = await response.json()
-      
-      return {
-        name: data.name,
-        id: data.id,
-        type: data.types,
-        sprite: data.sprites.front_default || '',
-        loading: false,
-        url: url
-      }
-    } catch (error) {
-      console.error(`Error fetching details for Pokemon ${id}:`, error)
-      return {
-        name: url.split('/').slice(-2, -1)[0] || 'Unknown',
-        id: parseInt(id),
-        type: [],
-        sprite: '',
-        loading: false,
-        url: url
-      }
-    }
-  }
 
-  const fetchPokemon = async (url: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch(url)
-      const data: PokemonResponse = await response.json()
-      
-      const initialPokemon: Pokemon[] = data.results.map(poke => ({
-        name: poke.name,
-        id: parseInt(extractPokemonId(poke.url)),
-        type: [],
-        sprite: '',
-        loading: true,
-        url: poke.url
-      }))
 
-      setPokemon(initialPokemon)
-      setNextUrl(data.next)
-      setPrevUrl(data.previous)
-      setLoading(false)
-
-      const detailedPokemonPromises = data.results.map(poke => 
-        fetchPokemonDetails(poke.url)
-      )
-      
-      const detailedPokemon = await Promise.all(detailedPokemonPromises)
-      setPokemon(detailedPokemon)
-      
-    } catch (error) {
-      console.error('Error fetching Pokemon:', error)
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchPokemon(currentUrl)
-  }, [currentUrl])
-
-  useEffect(() => {
-      const fetchAllPokemonNames = async () => {
-      try {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=2000')
-        const data: PokemonResponse = await response.json()
-        setAllPokemonNames(data.results)
-      } catch (error) {
-        console.error('Error fetching all Pokémon names:', error)
-      }
-    }
-
-    fetchAllPokemonNames()
-  }, [])
-  const handleNext = () => {
-    if (nextUrl) {
-      setCurrentUrl(nextUrl)
-    }
-  }
-
-  const handlePrevious = () => {
-    if (prevUrl) {
-      setCurrentUrl(prevUrl)
-    }
-  }
-
-  const formatPokemonId = (id: number) => {
-    return id.toString().padStart(4, '0')
-  }
-
-  const searchForPokemon = async () => {
-
-    setLastSearchTerm(searchTerm.trim())
-    setHasSearched(true)
-
-    if (!searchTerm.trim()) {
-      setFilteredPokemon([])
-      setIsSearching(false)
-      setHasSearched(false)
-      setLastSearchTerm('')
-      return
-    }
-
-    setIsSearching(true)
-    
-    try {
-      const matchingNames = allPokemonNames.filter(pokemon => 
-        pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-
-      const limitedMatches = matchingNames.slice(0, 12)
-
-      if (limitedMatches.length === 0) {
-        setFilteredPokemon([])
-        setIsSearching(false)
-        return
-      }
-
-      const pokemonDetailsPromises = limitedMatches.map(pokemon => 
-        fetchPokemonDetails(pokemon.url)
-      )
-      
-      const detailedPokemon = await Promise.all(pokemonDetailsPromises)
-      setFilteredPokemon(detailedPokemon)
-      
-    } catch (error) {
-      console.error('Error searching for Pokémon:', error)
-      setFilteredPokemon([])
-    }
-    setIsSearching(false)
-  }
-
-  const getTypeColor = (typeName: string) => {
-    return typeName === 'poison' || typeName === 'grass' ? '#18181BCC' : '#181A1B'
-  }
-
-  const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon: pokemon
+  const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon : pokemon
 
   return (
-      <div className={'${inter.className} min-h-screen flex flex-col mx-auto bg-white max-w-full'}>
+    <div className={`${inter.className} min-h-screen flex flex-col bg-white`}>
+      <Header 
+        title="Pokémon Browser" 
+        subtitle="Search and find Pokémon" 
+      />
       
-      {/* Header Section*/}
-      <div
-        className="flex flex-col items-center justify-center py-16">
-        <h1 className="text-4xl md:text-6xl font-semibold text-center mb-4">
-          Pokémon Browser
-        </h1>
-          <h2 className="text-xl md:text-3xl font-semibold text-center text-[#71717A]"> 
-          Search and find Pokémon
-        </h2>
-      </div>
+      <Separator />
 
-      {/* First Separator */}
-      <div className="py-8">
-        <div className="w-full h-px bg-gray-300"></div>
-      </div>
-
-      {/* Main Content Area */}
+      {/* Main Content Container*/}
       <div className="flex-1 flex flex-col items-center px-4 sm:px-6 lg:px-8">
-
-        {/* Search Section and Title */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full max-w-6xl mb-8 gap-4">
-          <div className="flex-1">
-            {hasSearched && filteredPokemon.length > 0 ? (
-              <h3 className="text-2xl font-semibold">
-                Search Results for '{lastSearchTerm}'
-                {filteredPokemon.length === 12 && " (showing first 12 results)"}
-              </h3>
-            ) : hasSearched && filteredPokemon.length === 0 && !isSearching ? (
-              <h3 className="text-xl font-semibold">
-                No Pokémon found for "{lastSearchTerm}"
-              </h3>
-            ) : (
-              <h3 className="text-2xl font-semibold">Explore Pokémon</h3>
-            )}
-          </div>
-        
-        <div className="flex gap-2 w-full sm:w-auto min-w-0 sm:min-w-80">        
-          <Input 
-            placeholder="Find Pokémon" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1"
-          />
-          <Button
-            onClick={searchForPokemon}
-            disabled={isSearching}
-            variant='default'
-          >
-            {isSearching ? "Searching..." : "Search"}
-          </Button>
-          </div>
-        </div>
-      
-      {/* Pokemon Grid */}
-      { loading ? (
-        <div className="flex items-center justify-center w-full max-w-6xl mb-8" style={{ minHeight: '400px' }}>
-          <div className="flex flex-col items-center gap-3">
-            <LoadingSpinner size="lg" />
-          </div>
-        </div>
-      ) : (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl mb-8">
-        {pokemonToDisplay.map((poke) => {
-          const pokeId = extractPokemonId(poke.url)
-          return (
-            <Link key={poke.name} href={`/pokemon/${pokeId}`}>
-              <Card className="cursor-pointer hover:shadow-lg transition-shadow w-full h-full overflow-hidden p-0">
-                {poke.loading ? (
-                  <>
-                    <CardHeader>
-                      <CardTitle className="capitalize text-sm">{poke.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-xs text-gray-500">Opening Pokéball...</div>
-                    </CardContent>
-                  </>
-                ) : (
-                  <CardContent className="p-0 h-full flex flex-col">
-                    <div 
-                      className="flex justify-center mb-3 bg-zinc-100 rounded-t-lg"
-                      style={{ minHeight: '200px' }}
-                    >
-                      {poke.sprite && (
-                        <img src={poke.sprite} 
-                        alt={poke.name} 
-                        className="object-contain"  
-                        style={{ width: '266px', height: '224px' }}
-                        />
-                      )}
-                    </div>
-                    <div className="px-3 pb-3 flex flex-col flex-1">
-                      <h3 className="text-2xl font-semibold capitalize mb-1 px-2">{poke.name}</h3>
-                      <p className="text-md text-zinc-500 font-semibold mb-10 px-2">#{formatPokemonId(poke.id)}</p>
-                      <div className="px-2 flex gap-3 flex-wrap mt-auto mb-4">
-                        {poke.type.map((type, index) => (
-                          <span 
-                            key={index}
-                            className="px-2.5 py-0.5 font-semibold text-white text-xs rounded-sm capitalize flex items-center justify-center"
-                            style={{backgroundColor: getTypeColor(type.type.name)}}
-                          >
-                            {type.type.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                  </CardContent>
-                )}
-              </Card>
-            </Link>
-          )
-        })}
-      </div>
-      )}
-      
-        {/* Navigation Buttons */}
-        <div className="flex justify-center items-center gap-4 mb-8">
-          <Button 
-            onClick={handlePrevious} 
-            disabled={!prevUrl}
-            variant="default"
-            className="bg-black text-white hover:bg-[#181A1B] disabled:bg-[#8C8D8D]"
-          >
-            &#8592; Back
-          </Button>
           
-          <Button 
-            onClick={handleNext} 
-            disabled={!nextUrl}
-            variant="default"
-            className="bg-black text-white hover:bg-[#181A1B] disabled:bg-[#8C8D8D]"
-          >
-            Next &#8594;
-          </Button>
+          {/* Search Section */}
+          <PokemonSearch
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+            onSearch={searchForPokemon}
+            isSearching={isSearching}
+            hasSearched={hasSearched}
+            lastSearchTerm={lastSearchTerm}
+            resultCount={filteredPokemon.length}
+            maxResults={MAX_SEARCH_RESULTS}
+          />
+        
+          { loading ? (
+            <div className="flex-1 flex items-center justify-center py-16">
+              <div className="flex flex-col items-center gap-3">
+                <LoadingSpinner size="lg" />
+              </div>
+            </div>
+          ) : (
+          <PokemonGrid pokemon={pokemonToDisplay}/>
+          )}
+
+          {/* Navigation Buttons*/}
+            {(!hasSearched || (hasSearched && !returnsResults)) && (
+              <div className="flex justify-center">
+                <NavigationButtons
+                  onPrevious={handlePrevious}
+                  onNext={handleNext}
+                  hasPrevious={!!prevUrl}
+                  hasNext={!!nextUrl}
+                />
+              </div>
+          )}
+          
         </div>
-      </div>
 
-      {/* Second Separator*/}
-      <div className="py-8">
-        <div className="w-full h-px bg-gray-300"></div>
-      </div>
-
-      {/* Footer Section*/}
-      <div className="py-16 text-center text-lg text-semibold">
-          Thank you for using Pokémon Browser!
-      </div>
+      <Separator />
+      <Footer />
     </div>
   )
 }
