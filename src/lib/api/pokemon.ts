@@ -3,9 +3,11 @@ import {
     DetailedPokemonResponse, 
     Pokemon, 
     PokemonDetail,
+    PokemonSpecies,
     SimplePokemon 
   } from '@/lib/types/pokemon'
   import { POKEMON_API_BASE_URL } from '@/lib/constants/pokemon'
+  import { getGenderDisplay, getWeaknessTypes } from '@/lib/utils/pokemon'
   
   export const extractPokemonId = (url: string): string => {
     const parts = url.split('/')
@@ -36,6 +38,14 @@ import {
     const response = await fetch(`${POKEMON_API_BASE_URL}/pokemon/${pokemonId}`)
     if (!response.ok) {
       throw new Error('Pokémon not found')
+    }
+    return response.json()
+  }
+  
+  export const fetchPokemonSpecies = async (speciesUrl: string): Promise<PokemonSpecies> => {
+    const response = await fetch(speciesUrl)
+    if (!response.ok) {
+      throw new Error('Failed to fetch Pokémon species data')
     }
     return response.json()
   }
@@ -75,3 +85,6 @@ import {
       }
     }
   }
+  
+  // Export the utility functions for use in components
+  export { getGenderDisplay, getWeaknessTypes }

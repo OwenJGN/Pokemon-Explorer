@@ -1,7 +1,3 @@
-// ============================================
-// File: src/hooks/usePokemon.ts
-// ============================================
-
 import { useState, useEffect } from 'react'
 import { Pokemon, SimplePokemon } from '@/lib/types/pokemon'
 import { 
