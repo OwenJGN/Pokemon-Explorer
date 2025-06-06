@@ -12,6 +12,7 @@ import { usePokemon } from '@/hooks/usePokemon'
 import { usePokemonSearch } from '@/hooks/usePokemonSearch'
 import { MAX_SEARCH_RESULTS } from '@/lib/constants/pokemon'
 
+// Configure Inter font from the Figma design
 const inter = Inter({
   subsets: ['latin'],
   weight: ['600'], 
@@ -19,6 +20,7 @@ const inter = Inter({
 })
 
 export default function HomePage() {
+  // Main hook for fetching and paginating through Pokémon lists from API
   const {
     pokemon,
     loading,
@@ -29,6 +31,7 @@ export default function HomePage() {
     handlePrevious
   } = usePokemon()
 
+  // Search functionality hook - handles filtering through all available Pokémon
   const {
     searchTerm,
     setSearchTerm,
@@ -40,12 +43,12 @@ export default function HomePage() {
     searchForPokemon
   } = usePokemonSearch(allPokemonNames)
 
-
-
+  // Determine which Pokémon to display: search results take priority over paginated list
   const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon : pokemon
 
   return (
     <div className={`${inter.className} min-h-screen flex flex-col bg-white`}>
+      {/* Page header with title and subtitle */}
       <Header 
         title="Pokémon Browser" 
         subtitle="Search and find Pokémon" 
@@ -53,10 +56,10 @@ export default function HomePage() {
       
       <Separator />
 
-      {/* Main Content Container*/}
+      {/* Main content container with centered layout */}
       <div className="flex-1 flex flex-col items-center px-4 sm:px-6 lg:px-8">
           
-          {/* Search Section */}
+          {/* Search section - allows users to search through all available Pokémon */}
           <PokemonSearch
             searchTerm={searchTerm}
             onSearchTermChange={setSearchTerm}
@@ -68,6 +71,7 @@ export default function HomePage() {
             maxResults={MAX_SEARCH_RESULTS}
           />
         
+          {/* Conditional rendering: show loading spinner or Pokémon grid */}
           { loading ? (
             <div className="flex-1 flex items-center justify-center py-16">
               <div className="flex flex-col items-center gap-3">
@@ -78,7 +82,7 @@ export default function HomePage() {
           <PokemonGrid pokemon={pokemonToDisplay}/>
           )}
 
-          {/* Navigation Buttons*/}
+          {/* Navigation buttons - only show when not searching or when search returns no results */}
             {(!hasSearched || (hasSearched && !returnsResults)) && (
               <div className="flex justify-center">
                 <NavigationButtons

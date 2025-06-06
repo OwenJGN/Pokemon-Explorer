@@ -7,6 +7,11 @@ interface NavigationButtonsProps {
   hasNext: boolean
 }
 
+/**
+ * Pagination navigation component for moving between pages of Pokemon data
+ * Handles both forward and backward navigation with disabled states
+ * Used on the main page for browsing through API results
+ */
 const NavigationButtons = ({ 
   onPrevious, 
   onNext, 
@@ -15,6 +20,8 @@ const NavigationButtons = ({
 }: NavigationButtonsProps) => {
   return (
     <div className="flex justify-center items-center gap-4 mb-8">
+      
+      {/* Previous button - disabled when on first page */}
       <Button 
         onClick={onPrevious} 
         disabled={!hasPrevious}
@@ -24,6 +31,7 @@ const NavigationButtons = ({
         ← Back
       </Button>
       
+      {/* Next button - disabled when on last page */}
       <Button 
         onClick={onNext} 
         disabled={!hasNext}
