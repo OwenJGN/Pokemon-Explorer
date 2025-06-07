@@ -10,7 +10,6 @@ import NavigationButtons from '@/components/common/NavigationButtons'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import { usePokemon } from '@/hooks/usePokemon'
 import { usePokemonSearch } from '@/hooks/usePokemonSearch'
-import { MAX_SEARCH_RESULTS } from '@/lib/constants/pokemon'
 
 // Configure Inter font from the Figma design
 const inter = Inter({
@@ -32,7 +31,7 @@ export default function HomePage() {
     handlePrevious
   } = usePokemon()
 
-  // Search functionality hook - handles filtering through all available Pokémon
+  // Search functionality hook - handles filtering through all available Pokémon with pagination
   const {
     searchTerm,
     setSearchTerm,
@@ -41,11 +40,37 @@ export default function HomePage() {
     hasSearched,
     lastSearchTerm,
     returnsResults,
-    searchForPokemon
+    searchForPokemon,
+    totalResults,
+    currentPage,
+    totalPages,
+    hasNextPage,
+    hasPreviousPage,
+    handleSearchNext,
+    handleSearchPrevious
   } = usePokemonSearch(allPokemonNames)
 
-  // Determine which Pokémon to display: search results take priority over paginated list
-  const pokemonToDisplay = filteredPokemon.length > 0 ? filteredPokemon : pokemon
+  // Determine which Pokémon to display and which navigation to show
+  const isInSearchMode = hasSearched && returnsResults
+  const isEmptySearchResult = hasSearched && !returnsResults
+  
+  // Show different content based on mode
+  const pokemonToDisplay = isInSearchMode ? filteredPokemon : (isEmptySearchResult ? [] : pokemon)
+  
+  // Determine which navigation handlers to use
+  const navigationHandlers = isInSearchMode 
+    ? {
+        onNext: handleSearchNext,
+        onPrevious: handleSearchPrevious,
+        hasNext: hasNextPage,
+        hasPrevious: hasPreviousPage
+      }
+    : {
+        onNext: handleNext,
+        onPrevious: handlePrevious,
+        hasNext: !!nextUrl,
+        hasPrevious: !!prevUrl
+      }
 
   return (
     <div className={`${inter.className} min-h-screen flex flex-col bg-white`}>
@@ -58,7 +83,7 @@ export default function HomePage() {
       
       <Separator />
 
-      {/* Main content container with centered layout */}
+      {/* Main content container with centred layout */}
       <div className="flex-1 flex flex-col items-center px-4 sm:px-6 lg:px-8">
           
           {/* Search section - allows users to search through all available Pokémon */}
@@ -70,30 +95,32 @@ export default function HomePage() {
             hasSearched={hasSearched}
             lastSearchTerm={lastSearchTerm}
             resultCount={filteredPokemon.length}
-            maxResults={MAX_SEARCH_RESULTS}
+            totalResults={totalResults}
+            currentPage={currentPage}
+            totalPages={totalPages}
           />
         
           {/* Conditional rendering: show loading spinner or Pokémon grid */}
-          { loading ? (
+          {loading || isSearching ? (
             <div className="flex-1 flex items-center justify-center py-16">
               <div className="flex flex-col items-center gap-3">
                 <LoadingSpinner size="lg" />
               </div>
             </div>
           ) : (
-          <PokemonGrid pokemon={pokemonToDisplay}/>
+            <PokemonGrid pokemon={pokemonToDisplay}/>
           )}
 
-          {/* Navigation buttons - only show when not searching or when search returns no results */}
-            {(!hasSearched || (hasSearched && !returnsResults)) && (
-              <div className="flex justify-center">
-                <NavigationButtons
-                  onPrevious={handlePrevious}
-                  onNext={handleNext}
-                  hasPrevious={!!prevUrl}
-                  hasNext={!!nextUrl}
-                />
-              </div>
+          {/* Navigation buttons - only show when not in empty search result state */}
+          {!loading && !isSearching && !isEmptySearchResult && (
+            <div className="flex justify-center">
+              <NavigationButtons
+                onPrevious={navigationHandlers.onPrevious}
+                onNext={navigationHandlers.onNext}
+                hasPrevious={navigationHandlers.hasPrevious}
+                hasNext={navigationHandlers.hasNext}
+              />
+            </div>
           )}
           
         </div>

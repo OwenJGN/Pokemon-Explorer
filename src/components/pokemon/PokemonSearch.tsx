@@ -9,12 +9,14 @@ interface PokemonSearchProps {
   hasSearched: boolean
   lastSearchTerm: string
   resultCount: number
-  maxResults: number
+  totalResults?: number
+  currentPage?: number
+  totalPages?: number
 }
 
 /**
  * Search interface component 
- * Provides real-time search functionality for finding specific Pokemon
+ * Provides real-time search functionality for finding specific Pokemon with pagination info
  */
 const PokemonSearch = ({
   searchTerm,
@@ -24,18 +26,23 @@ const PokemonSearch = ({
   hasSearched,
   lastSearchTerm,
   resultCount,
-  maxResults
+  totalResults,
+  currentPage,
+  totalPages
 }: PokemonSearchProps) => {
   
   /**
    * Dynamic title generation based on current search state
-   * Provides feedback about search results or current browse mode
+   * Provides feedback about search results with pagination info
    */
   const getTitle = () => {
     
-    // Show search results with count and pagination info
-    if (hasSearched && resultCount > 0) {
-      return `Search Results for '${lastSearchTerm}'${resultCount === maxResults ? ` (showing first ${maxResults} results)` : ''}`
+    // Show search results with pagination info
+    if (hasSearched && resultCount > 0 && totalResults  && currentPage && totalPages) {
+      if(resultCount === 1){
+        return `Search Results for '${lastSearchTerm}'`
+      }
+      return `Search Results for '${lastSearchTerm}' (${totalResults} total results - Page ${currentPage} of ${totalPages})`
     }
     // Show no results message for unsuccessful searches
     if (hasSearched && resultCount === 0 && !isSearching) {

@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Pokemon } from '@/lib/types/pokemon'
 import { extractPokemonId, formatPokemonId } from '@/lib/api/pokemon'
-import LoadingSpinner from '@/components/common/LoadingSpinner'
+import PokemonCardSkeleton from '@/components/common/PokemonCardSkeleton'
 
 interface PokemonCardProps {
   pokemon: Pokemon
@@ -26,19 +26,12 @@ const PokemonCard = ({ pokemon }: PokemonCardProps) => {
   // Extract Pokemon ID from API URL for navigation routing
   const pokeId = extractPokemonId(pokemon.url)
 
-  // Show loading state while Pokemon details are being fetched
+  // Show skeleton loading state while Pokemon details are being fetched
   if (pokemon.loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center py-16">
-          <div className="flex flex-col items-center gap-3">
-              <LoadingSpinner size="lg" />
-          </div>
-      </div>
-    )
+    return <PokemonCardSkeleton />
   }
 
   return (
-    
     // Entire card is wrapped in Link for navigation to detail page
     <Link href={`/pokemon/${pokeId}`}>
       <Card className="cursor-pointer hover:shadow-lg transition-shadow w-full h-full overflow-hidden p-0">
