@@ -46,6 +46,7 @@ export const usePokemonSearch = (allPokemonNames: SimplePokemon[]) => {
     setIsSearching(true)
     
     try {
+      
       // Calculate the slice of results for this page
       const startIndex = pageIndex * POKEMON_PER_PAGE
       const endIndex = startIndex + POKEMON_PER_PAGE
